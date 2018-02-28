@@ -1,6 +1,6 @@
 
 keywords = ["let","type","impure","import","from","in","macro","do","where","for","while","if","else"]
-operators = [":","=","==","+","-","*","/","%","&&","&","||","|","^","**","!","(",")","$"]
+operators = [":","=","==","+","-","*","/","%","&&","&","||","|","^","**","!","(",")","$",";","/*","//","*/"]
 
 
 def readFile(f):
@@ -13,6 +13,8 @@ def tokenize(s,mode, tokenList = []):
     #print(s,tokenList)
     def grabAlphanumeric(s):
         def grabAlphanumericHelper(s,done): #clobbers input until alphanumeric
+            if len(s) == 0:
+                return None
             if s[0].isalnum():
                 try:
                     return str(s[0]) + str(grabAlphanumericHelper(s[1:],True))
@@ -46,27 +48,31 @@ def tokenize(s,mode, tokenList = []):
         token = grabSymbol(s)
         return (token, "operator")
     if mode == "all":
+        s = s.replace('\r','')
+        s = s.replace('\n',';')
         ls = tokenList
         tokenA = grabAlphanumeric(s)
         tokenO = grabSymbol(s)
         #print("tokenA = ",tokenA)
         #print("tokenO = ",tokenO)
         trimmed = s.strip()
-        if trimmed.startswith(tokenA):
+        #print(trimmed)
+        if not tokenA == None and trimmed.startswith(tokenA):
             if tokenA in keywords:
                 ls.append((tokenA,"keyword"))
             else:
                 ls.append((tokenA,"identifier"))
             l = len(tokenA)
             return tokenize(trimmed[l:],"all",tokenList=ls)
-        elif trimmed.startswith(tokenO):
+        elif not tokenO == None and trimmed.startswith(tokenO):
             ls.append((tokenO,"operator"))
             l = len(tokenO)
             return tokenize(trimmed[l:],"all",tokenList=ls)
         else:
             return tokenize(trimmed[1:],"all",tokenList=ls)
-        
-result = tokenize("!x = 5","all")
+
+code = readFile("C:\\Users\\Josh\\Desktop\\Code\\Language\\program1.lang")
+result = tokenize(code,"all")
         
 print(result)
 
