@@ -1,7 +1,7 @@
 
 keywords = ["let","type","impure","import","from","in","macro","do","where","for","while","if","else"]
 operators = [":","=","==","+","-","*","/","%","&&","&","||","|","^","**","!","(",")","$",";","/*","//","*/"]
-
+#TODO: Handle constants, floating point numbers, newlines
 
 def readFile(f):
     with open(f) as file:
