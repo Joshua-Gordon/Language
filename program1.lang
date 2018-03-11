@@ -1,0 +1,30 @@
+/*
+A program written in Language that asks the user for their age, 
+and insults them based on it
+*/
+let main : ()
+main = impure //Type of an impure block is the type of the last line
+			  //Type of a "void" function is Unit
+		putLine "How old are you?"
+		let age = getLine ">"
+		let response = getResponse age
+		putLine response
+	let pi = 3.14159
+	let type3 = getRoundedType pi
+
+let getResponse : Int -> String
+getResponse 0 = "Fuckin' baby trying to use this program"
+getResponse n = if n < 20
+				"Get off my lawn!"
+			else
+				"Fuck, you're old."
+
+let getRoundedType : (n : Double) -> Type
+getRoundedType n = T<round n>
+		where round : Double -> Int
+		      round n = roundHelper n 0
+		      roundHelper : Double -> Int -> Int
+		      roundHelper d n = if d > n
+					    roundHelper d (n+1)
+					else
+					    n

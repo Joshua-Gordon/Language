@@ -60,6 +60,3 @@ def preproc(code):
     #print("STAGE 3",code)
     return code
 
-
-s = "macro Hello=Fuck the entire\nTest\nHello World\nHi//This is Josh\nThis is/* a test of*/ the preprocessor"
-print(preproc(s))

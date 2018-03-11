@@ -1,6 +1,6 @@
 
 keywords = ["let","type","impure","import","from","in","macro","do","where","for","while","if","else"]
-operators = [":","=","==","+","-","*","/","%","&&","&","||","|","^","**","!","(",")","$",";","/*","//","*/"]
+operators = [":","=","==","+","-","*","\\","/","%","&&","&","||","|","->","^","**","!","(",")","$",";","/*","//","*/","<",">","<=",">=",".","'",'"']
 #TODO: Handle constants, floating point numbers, newlines
 
 def readFile(f):
@@ -71,10 +71,30 @@ def tokenize(s,mode, tokenList = []):
         else:
             return tokenize(trimmed[1:],"all",tokenList=ls)
 
-code = readFile("C:\\Users\\Josh\\Desktop\\Code\\Language\\program1.lang")
-result = tokenize(code,"all")
-        
-print(result)
+def printTokens(tokenList):
+    strings = list(map(lambda t: t[0] + " ",tokenList))
+    return ''.join(strings)
+
+def refineTokens(tokenList): #goes through a list of identifiers, keywords, and operators, and outputs a list of identifiers, keywords, operators, and literals (int literal, lambda, etc.)
+    def isNumeric(token):
+        if token[1] == "identifier":
+            if token[0].isdigit():
+                return True
+
+        return False
+
+    def isFloat(idx): #index in tokenList
+        if isNumeric(tokenList[idx] and tokenList[idx+1] == (".","operator") and isNumeric(tokenList[idx+2]):
+            return True
+
+    def isLambda(idx): #Tells if there is a lambda header at this point in the token list
+        if tokenList[idx] == ("\\","operator"):
+                 while not tokenList[idx][0] == "->":
+                     idx+=1
+                     if not tokenList[idx][1] == "identifier":
+                         return False
+                 return True   
+
 
 
     
