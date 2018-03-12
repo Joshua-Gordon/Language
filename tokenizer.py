@@ -76,16 +76,35 @@ def printTokens(tokenList):
     return ''.join(strings)
 
 def refineTokens(tokenList): #goes through a list of identifiers, keywords, and operators, and outputs a list of identifiers, keywords, operators, and literals (int literal, lambda, etc.)
+    def isSequence(idx,tokens):
+        #Checks if a sequence of tokens is present at an index.
+        #If t[0] is None, then all values are matched
+        for i in range(idx,idx+len(tokens)):
+            t = tokens[i-idx]
+            if t[0] == None:
+                if tokenList[i][1] == t[1]:
+                    pass
+                else:
+                    return False
+            else:
+                if tokenList[i] == t:
+                    pass
+                else:
+                    return False
+        return True
+            
+
     def isNumeric(token):
         if token[1] == "identifier":
-            if token[0].isdigit():
+            if (""+token[0]).isdigit():
                 return True
 
         return False
 
     def isFloat(idx): #index in tokenList
-        if isNumeric(tokenList[idx] and tokenList[idx+1] == (".","operator") and isNumeric(tokenList[idx+2]):
+        if isNumeric(tokenList[idx]) and tokenList[idx+1] == (".","operator") and isNumeric(tokenList[idx+2]):
             return True
+        return False
 
     def isLambda(idx): #Tells if there is a lambda header at this point in the token list
         if tokenList[idx] == ("\\","operator"):
@@ -93,9 +112,56 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
                      idx+=1
                      if not tokenList[idx][1] == "identifier":
                          return False
-                 return True   
+                 return (True,idx)
+        return False
 
+    def isTExpression(idx): #Tells if T expression header
+        if isSequence(idx, [("T","identifier"),("<","operator")]):
+                     return True
+        return False
 
+    def isString(idx):
+        if tokenList[idx] == ('"',"operator"):
+            i = idx+1
+            try:
+                while not tokenList[i] == ('"',"operator"):
+                    i+=1
+            except:
+                return False
+            return (True,i-idx)
+        return False
+    
+    newTokenList = []
+    i = 0
+    while i < len(tokenList):
+        if isFloat(i):
+                i+=3
+                flt = ''.join(list(map(lambda s: s[0],tokenList))[i-3:i])
+                print(flt)
+                newTokenList.append((flt,"float"))
+        elif isNumeric(tokenList[i]):
+                num = tokenList[i][0]
+                newTokenList.append((num,"integer"))
+                i+=1
+        elif not isString(i) == False:
+                strlen = isString(i)[1]
+                string = ''.join(list(map(lambda s: s[0],tokenList))[i:i+strlen])
+                newTokenList.append((string,"string"))
+                i +=2+strlen
+        elif not isLambda(i) == False: #Please forgive me, but this is necessary
+                l = isLambda(i)
+                i = l[1]
+                newTokenList.append((l[0],"lambda header"))
+        elif isTExpression(i):
+                i+=2
+                TExp = ''.join(list(map(lambda s: s[0],tokenList))[i-2:i])
+                newTokenList.append((TExp,"t header"))
+        else:
+                newTokenList.append(tokenList[i])
+                i+=1
+    return newTokenList
+            
+        
 
     
     
