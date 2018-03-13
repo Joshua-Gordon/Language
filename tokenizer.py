@@ -130,6 +130,9 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
                 return False
             return (True,i-idx)
         return False
+
+    def isNewline(idx):
+        return tokenList[idx] == (";","operator")
     
     newTokenList = []
     i = 0
@@ -145,7 +148,7 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
                 i+=1
         elif not isString(i) == False:
                 strlen = isString(i)[1]
-                string = ''.join(list(map(lambda s: s[0],tokenList))[i:i+strlen])
+                string = ''.join(list(map(lambda s: s[0],tokenList))[i+1:i+strlen])
                 newTokenList.append((string,"string"))
                 i +=2+strlen
         elif not isLambda(i) == False: #Please forgive me, but this is necessary
@@ -156,6 +159,9 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
                 i+=2
                 TExp = ''.join(list(map(lambda s: s[0],tokenList))[i-2:i])
                 newTokenList.append((TExp,"t header"))
+        elif isNewline(i):
+                i+=1
+                newTokenList.append(("\n","newline"))
         else:
                 newTokenList.append(tokenList[i])
                 i+=1

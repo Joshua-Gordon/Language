@@ -7,5 +7,7 @@ print(code)
 result = tokenizer.tokenize(code,"all")
 print(result)
 refined = tokenizer.refineTokens(result)
-        
+
 for t in refined: print(t)
+
+print(tokenizer.printTokens(refined))
