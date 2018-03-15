@@ -7,7 +7,9 @@ def readFile(f):
     with open(f) as file:
         return file.read()
 
-def tokenize(s,mode, tokenList = []):
+def tokenize(s,mode, tokenList = None):
+    if tokenList is None:
+        tokenList = []
     if len(s) == 0:
         return tokenList
     #print(s,tokenList)
@@ -121,14 +123,16 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
         return False
 
     def isString(idx):
+        lens = []
         if tokenList[idx] == ('"',"operator"):
             i = idx+1
             try:
                 while not tokenList[i] == ('"',"operator"):
+                    lens.append(len(tokenList[i][0]))
                     i+=1
             except:
                 return False
-            return (True,i-idx)
+            return (True,i-idx,lens)
         return False
 
     def isNewline(idx):
@@ -137,34 +141,43 @@ def refineTokens(tokenList): #goes through a list of identifiers, keywords, and 
     newTokenList = []
     i = 0
     while i < len(tokenList):
-        if isFloat(i):
-                i+=3
-                flt = ''.join(list(map(lambda s: s[0],tokenList))[i-3:i])
-                print(flt)
-                newTokenList.append((flt,"float"))
-        elif isNumeric(tokenList[i]):
-                num = tokenList[i][0]
-                newTokenList.append((num,"integer"))
-                i+=1
-        elif not isString(i) == False:
-                strlen = isString(i)[1]
-                string = ''.join(list(map(lambda s: s[0],tokenList))[i+1:i+strlen])
-                newTokenList.append((string,"string"))
-                i +=2+strlen
-        elif not isLambda(i) == False: #Please forgive me, but this is necessary
-                l = isLambda(i)
-                i = l[1]
-                newTokenList.append((l[0],"lambda header"))
-        elif isTExpression(i):
-                i+=2
-                TExp = ''.join(list(map(lambda s: s[0],tokenList))[i-2:i])
-                newTokenList.append((TExp,"t header"))
-        elif isNewline(i):
-                i+=1
-                newTokenList.append(("\n","newline"))
-        else:
-                newTokenList.append(tokenList[i])
-                i+=1
+        try:
+            if isFloat(i):
+                    i+=3
+                    flt = ''.join(list(map(lambda s: s[0],tokenList))[i-3:i])
+                    #print(flt)
+                    newTokenList.append((flt,"float"))
+            elif isNumeric(tokenList[i]):
+                    num = tokenList[i][0]
+                    newTokenList.append((num,"integer"))
+                    i+=1
+            elif not isString(i) == False:
+                    strlen = isString(i)[1]
+                    string = ''.join(list(map(lambda s: s[0],tokenList))[i+1:i+strlen])
+                    lens = isString(i)[2]
+                    spaced = ""
+                    for length in lens:
+                        spaced = spaced + " " + string[length:]
+                        string = string[:length]
+                    newTokenList.append((spaced,"string"))
+                    i +=2+strlen
+            elif not isLambda(i) == False: #Please forgive me, but this is necessary
+                    l = isLambda(i)
+                    i = l[1]
+                    newTokenList.append((l[0],"lambda header"))
+            elif isTExpression(i):
+                    i+=2
+                    TExp = ''.join(list(map(lambda s: s[0],tokenList))[i-2:i])
+                    newTokenList.append((TExp,"t header"))
+            elif isNewline(i):
+                    i+=1
+                    newTokenList.append(("\n","newline"))
+            else:
+                    newTokenList.append(tokenList[i])
+                    i+=1
+        except:
+            i+=1
+            print("Token error on " + str(tokenList[-5:]))
     return newTokenList
             
         
